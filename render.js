@@ -10,11 +10,11 @@ const vsSource = `
 const fsSource = `
     precision mediump float;
     uniform vec2 uResolution;
-    uniform vec2 uCircleCenters[10]; // Array of circle centers
-    uniform float uCircleRadii[10];  // Array of circle radii
-    uniform int uCircleCount;        // Number of circles
+    uniform vec2 uBlobCenters[30]; // Array of blob centers
+    uniform float uBlobRadii[30];  // Array of blob radii
+    uniform int uBlobCount;        // Number of blobs
 
-    float circleSDF(vec2 st, vec2 p, float r, float aspect)
+    float blobSDF(vec2 st, vec2 p, float r, float aspect)
     {
         vec2 diff = p - st;
         diff.x *= aspect;
@@ -35,24 +35,18 @@ const fsSource = `
 
         float d = 99.;
         for (int i = 0; i < 20; ++i) {
-            if (i >= uCircleCount) {
-                break;
-            }
-
-            vec2 c = uCircleCenters[i];
-            float sdf = circleSDF(st, c, uCircleRadii[i], aspect);
-
-            // sdf*=aspect;
+            vec2 c = uBlobCenters[i];
+            float sdf = blobSDF(st, c, uBlobRadii[i], aspect);
             d = smin(d, sdf, 0.1);
         }
 
-        float shape = smoothstep(0.0, 0.001, d);
+        float shape = 1. - smoothstep(0.0, 0.001, d);
 
-        gl_FragColor = vec4(vec3(shape), 1.0);
+        gl_FragColor = vec4(vec3(0., 0.1, 0.3), shape);
     }
 `;
 
-const MAX_CIRCLES = 20;
+const MAX_BLOBS = 30;
 
 // Creates a shader of the given type, uploads the source and compiles it.
 function loadShader(gl, type, source) {
@@ -105,14 +99,14 @@ export function setupShaderProgram(gl) {
         },
         uniformLocations: {
             resolution: gl.getUniformLocation(shaderProgram, 'uResolution'),
-            circleCenters: [],
-            circleRadii: [],
-            circleCount: gl.getUniformLocation(shaderProgram, 'uCircleCount'),
+            blobCenters: [],
+            blobRadii: [],
+            blobCount: gl.getUniformLocation(shaderProgram, 'uBlobCount'),
         },
     };
-    for (let i = 0; i < MAX_CIRCLES; i++) {
-        programInfo.uniformLocations.circleCenters.push(gl.getUniformLocation(shaderProgram, `uCircleCenters[${i}]`));
-        programInfo.uniformLocations.circleRadii.push(gl.getUniformLocation(shaderProgram, `uCircleRadii[${i}]`));
+    for (let i = 0; i < MAX_BLOBS; i++) {
+        programInfo.uniformLocations.blobCenters.push(gl.getUniformLocation(shaderProgram, `uBlobCenters[${i}]`));
+        programInfo.uniformLocations.blobRadii.push(gl.getUniformLocation(shaderProgram, `uBlobRadii[${i}]`));
     }
 
     return programInfo;
@@ -133,7 +127,7 @@ export function setupBuffer(gl) {
     return positionBuffer;
 }
 
-export function render(gl, programInfo, positionBuffer, circles) {
+export function render(gl, programInfo, positionBuffer, blobs) {
     gl.clearColor(1.0, 1.0, 1.0, 1.0);  // Clear to white, fully opaque
     gl.clear(gl.COLOR_BUFFER_BIT);
 
@@ -155,15 +149,15 @@ export function render(gl, programInfo, positionBuffer, circles) {
     );
     gl.enableVertexAttribArray(programInfo.attribLocations.vertexPosition);
 
-    // Pass the circle data to the shader
-    let count = Math.min(circles.length, MAX_CIRCLES);
-    gl.uniform1i(programInfo.uniformLocations.circleCount, count);
+    // Pass the blob data to the shader
+    let count = Math.min(blobs.length, MAX_BLOBS);
+    gl.uniform1i(programInfo.uniformLocations.blobCount, count);
 
     for (let i = 0; i < count; i++) {
-        gl.uniform2f(programInfo.uniformLocations.circleCenters[i], circles[i].x, circles[i].y);
-        gl.uniform1f(programInfo.uniformLocations.circleRadii[i], circles[i].radius);
+        gl.uniform2f(programInfo.uniformLocations.blobCenters[i], blobs[i].pos.x, 1 - blobs[i].pos.y);
+        gl.uniform1f(programInfo.uniformLocations.blobRadii[i], blobs[i].radius);
     }
 
-    // Draw the circles
+    // Draw the blobs
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 }

@@ -3,11 +3,42 @@
 <head>
     <title>Blobs</title>
     <style>
-        canvas { display: block; } 
+        html, body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden; 
+        }
+
+        canvas { 
+            display: block; 
+            width: 100%;
+            max-height: calc(100vh - 30px); /* Adjust the 50px to the height of your link */
+            height: auto;
+        } 
+
+        #link-container a { /* Target the <a> tag specifically */
+            position: fixed;
+            bottom: 10px;
+            width: 100%;
+            text-align: center;
+            color: #001a4d8a;
+            text-decoration: none; /* Apply text-decoration to <a> tag */
+        }
+
+        #fps {
+            position: fixed;
+            left: 10px;
+            bottom: 10px;
+            color: #001a4d1a;
+        }
     </style>
 </head>
 <body>
     <canvas id="webglCanvas"></canvas>
-    <script  type="module" src="app.js"></script>
+    <div id="link-container">
+        <a href="https://github.com/aestuans/blob" target="_blank">Code</a>
+    </div>
+    <div id="fps">FPS: --</div>
+    <script type="module" src="app.js"></script>
 </body>
 </html>
