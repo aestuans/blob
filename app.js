@@ -1,11 +1,4 @@
-import { getGl, setupShaderProgram, setupBuffer, render } from './render.js';
-
-const gl = getGl();
-const programInfo = setupShaderProgram(gl);
-const positionBuffer = setupBuffer(gl);
-
-let mouseX = 0.5; // Middle of the screen
-let mouseY = 0.5; // Middle of the screen
+import { getGl, setupShaderProgram, setupBuffer, render, MAX_BLOBS } from './render.js';
 
 class Vec2 {
     constructor(x, y) {
@@ -45,14 +38,12 @@ class Vec2 {
 }
 
 class Blob {
-    static maxSpeed = 0.7;
-    static gravityConstant = 0.0015;
-    static repulsionConstant = 0.00005;
-    static momentum = 0.9;
+    static maxSpeed = 1.2;
+    static gravityConstant = 0.0005;
+    static momentum = 0.95;
 
-    constructor(pos, radius) {
+    constructor(pos) {
         this.pos = pos;
-        this.radius = radius;
 
         this.velocity = new Vec2(0, 0);
         this.prevVelocity = new Vec2(0, 0);
@@ -92,21 +83,12 @@ class Blob {
         if (this.pos.x < 0 || this.pos.x > 1)
         {
             this.prevVelocity.x *= -1;
-            // this.momentum.x *= -1;
         }
         if (this.pos.y < 0 || this.pos.y > 1)
         {
             this.prevVelocity.y *= -1;
-            // this.momentum.y *= -1;
         }
     }
-}
-
-
-
-let blobs = [];
-for (let i = 0; i < 20; i++) {
-    blobs.push(new Blob(new Vec2(Math.random(), Math.random()), 0.02));
 }
 
 function calculateFPS() {
@@ -138,5 +120,17 @@ document.addEventListener('mousemove', (e) => {
     mouseX = e.clientX / window.innerWidth;
     mouseY = e.clientY / window.innerHeight;
 });
+
+const gl = getGl();
+const programInfo = setupShaderProgram(gl);
+const positionBuffer = setupBuffer(gl);
+
+let mouseX = 0.5; // Middle of the screen
+let mouseY = 0.5; // Middle of the screen
+
+let blobs = [];
+for (let i = 0; i < MAX_BLOBS; i++) {
+    blobs.push(new Blob(new Vec2(Math.random(), Math.random())));
+}
 
 drawScene();

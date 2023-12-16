@@ -1,3 +1,6 @@
+export const MAX_BLOBS = 25;
+export const BLOB_RADIUS = 0.02;
+
 // Vertex shader program
 const vsSource = `
     attribute vec4 aVertexPosition;
@@ -10,8 +13,7 @@ const vsSource = `
 const fsSource = `
     precision mediump float;
     uniform vec2 uResolution;
-    uniform vec2 uBlobCenters[30]; // Array of blob centers
-    uniform float uBlobRadii[30];  // Array of blob radii
+    uniform vec2 uBlobCenters[${MAX_BLOBS}]; // Array of blob centers
     uniform int uBlobCount;        // Number of blobs
 
     float blobSDF(vec2 st, vec2 p, float r, float aspect)
@@ -22,11 +24,10 @@ const fsSource = `
         return length(diff) - r;
     }
 
-    // Polynomial smooth min
-    float smin(float a, float b, float k)
+    float polySmoothMin(float a, float b, float k)
     {
-        float h = max( k-abs(a-b), 0.0 )/k;
-        return min( a, b ) - h*h*k*(1.0/4.0);
+        float h = clamp(0.5 + 0.5*(a-b)/k, 0.0, 1.0);
+        return mix(a, b, h) - k*h*(1.0-h);
     }
 
     void main() {
@@ -34,10 +35,13 @@ const fsSource = `
         vec2 st = gl_FragCoord.xy / uResolution;
 
         float d = 99.;
-        for (int i = 0; i < 20; ++i) {
+        for (int i = 0; i < ${MAX_BLOBS}; ++i) {
+            if (i >= uBlobCount) {
+                break;
+            }
             vec2 c = uBlobCenters[i];
-            float sdf = blobSDF(st, c, uBlobRadii[i], aspect);
-            d = smin(d, sdf, 0.1);
+            float sdf = blobSDF(st, c, ${BLOB_RADIUS}, aspect);
+            d = polySmoothMin(d, sdf, 0.1);
         }
 
         float shape = 1. - smoothstep(0.0, 0.001, d);
@@ -45,8 +49,6 @@ const fsSource = `
         gl_FragColor = vec4(vec3(0., 0.1, 0.3), shape);
     }
 `;
-
-const MAX_BLOBS = 30;
 
 // Creates a shader of the given type, uploads the source and compiles it.
 function loadShader(gl, type, source) {
@@ -100,13 +102,11 @@ export function setupShaderProgram(gl) {
         uniformLocations: {
             resolution: gl.getUniformLocation(shaderProgram, 'uResolution'),
             blobCenters: [],
-            blobRadii: [],
             blobCount: gl.getUniformLocation(shaderProgram, 'uBlobCount'),
         },
     };
     for (let i = 0; i < MAX_BLOBS; i++) {
         programInfo.uniformLocations.blobCenters.push(gl.getUniformLocation(shaderProgram, `uBlobCenters[${i}]`));
-        programInfo.uniformLocations.blobRadii.push(gl.getUniformLocation(shaderProgram, `uBlobRadii[${i}]`));
     }
 
     return programInfo;
@@ -155,7 +155,6 @@ export function render(gl, programInfo, positionBuffer, blobs) {
 
     for (let i = 0; i < count; i++) {
         gl.uniform2f(programInfo.uniformLocations.blobCenters[i], blobs[i].pos.x, 1 - blobs[i].pos.y);
-        gl.uniform1f(programInfo.uniformLocations.blobRadii[i], blobs[i].radius);
     }
 
     // Draw the blobs
