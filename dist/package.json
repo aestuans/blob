@@ -1,0 +1,14 @@
+{
+  "name": "blob",
+  "version": "0.1.0",
+  "files": [
+    "blob_bg.wasm",
+    "blob.js",
+    "blob.d.ts"
+  ],
+  "module": "blob.js",
+  "types": "blob.d.ts",
+  "sideEffects": [
+    "./snippets/*"
+  ]
+}
