@@ -1,28 +1,35 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Blobs</title>
+    <title>blob</title>
     <style>
         html, body {
             margin: 0;
             padding: 0;
-            overflow: hidden; 
+            overflow: hidden;
         }
 
-        canvas { 
-            display: block; 
+        canvas {
+            display: block;
             width: 100%;
-            max-height: calc(100vh - 30px); /* Adjust the 50px to the height of your link */
+            max-height: calc(100vh - 34px);
             height: auto;
-        } 
+        }
 
-        #link-container a { /* Target the <a> tag specifically */
+        #link-container {
             position: fixed;
             bottom: 10px;
             width: 100%;
             text-align: center;
+        }
+
+        #link-container a {
             color: #001a4d8a;
-            text-decoration: none; /* Apply text-decoration to <a> tag */
+            text-decoration: none;
+            background: url('https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png') no-repeat left center;
+            background-size: 30px 30px;
+            padding: 4px 0px 0px 34px;
+            display: inline-block;
         }
 
         #fps {
@@ -36,7 +43,7 @@
 <body>
     <canvas id="webglCanvas"></canvas>
     <div id="link-container">
-        <a href="https://github.com/aestuans/blob" target="_blank">Code</a>
+        <a href="https://github.com/aestuans/blob" target="_blank">code</a>
     </div>
     <div id="fps">FPS: --</div>
     <script type="module" src="dist/app.js"></script>
