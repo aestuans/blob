@@ -33,10 +33,23 @@ for (let i = 0; i < renderer.MAX_BLOBS; i++) {
 
 let mouseX = 0.5;
 let mouseY = 0.5;
+
+function updatePosition(x: number, y: number) {
+    mouseX = x / window.innerWidth;
+    mouseY = y / window.innerHeight;
+}
+
 document.addEventListener('mousemove', (e) => {
-    mouseX = e.clientX / window.innerWidth;
-    mouseY = e.clientY / window.innerHeight;
+    updatePosition(e.clientX, e.clientY);
 });
+
+document.addEventListener('touchmove', (e) => {
+    e.preventDefault();
+    if (e.touches.length > 0) {
+        const touch = e.touches[0];
+        updatePosition(touch.clientX, touch.clientY);
+    }
+}, { passive: false });
 
 function drawScene() {
     blobs.forEach(blob => {
