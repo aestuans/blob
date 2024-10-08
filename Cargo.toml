@@ -10,8 +10,32 @@ crate-type = ["cdylib"]
 wasm-bindgen = "0.2"
 nalgebra = "0.32"
 rand = "0.8"
-getrandom = { version = "0.2", features = ["js"] } # needed for random bindings
+js-sys = "0.3"
+
+[dependencies.getrandom]
+version = "0.2"
+features = ["js"]
+
+[dependencies.web-sys]
+version = "0.3"
+features = [
+  "WebGlUniformLocation",
+  "Document",
+  "Element",
+  "HtmlCanvasElement",
+  "HtmlDivElement",
+  "WebGlBuffer",
+  "WebGlVertexArrayObject",
+  "WebGl2RenderingContext",
+  "WebGlProgram",
+  "WebGlShader",
+  "Window",
+  "MouseEvent",
+  "TouchEvent",
+  "TouchList",
+  "Touch",
+  "console",
+]
 
 [package.metadata.wasm-pack.profile.dev.wasm-bindgen]
-# Should we emit the DWARF debug info custom sections?
 dwarf-debug-info = true

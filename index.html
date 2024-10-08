@@ -41,11 +41,14 @@
     </style>
 </head>
 <body>
-    <canvas id="webglCanvas"></canvas>
+    <canvas id="canvas"></canvas>
     <div id="link-container">
         <a href="https://github.com/aestuans/blob" target="_blank">code</a>
     </div>
     <div id="fps">FPS: --</div>
-    <script type="module" src="dist/app.js"></script>
+    <script type="module">
+        import run from './dist/blob.js';
+        run();
+    </script>
 </body>
 </html>
