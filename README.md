@@ -1,6 +1,6 @@
 # blob
 
-A simple 2D fluid and gravity simulation, written in Rust and rendered with WebGL: https://aestuans.github.io/blob/
+A showcase of wasm and WebGL in Rust through a simple 2D fluid and gravity simulation: https://aestuans.github.io/blob/
 
 ## Build
 
