@@ -15,12 +15,6 @@ cargo install wasm-pack
 wasm-pack build --release --target web --out-dir dist/
 ```
 
-3. Generate JS
-
-```
-tsc
-```
-
 4. Run with a simple http server. Such as:
 ```
 python -m http.server
